@@ -14,6 +14,8 @@
 //}
 
 package com.example.justjava;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
@@ -39,20 +41,10 @@ public class MainActivity extends AppCompatActivity {
         TextView quantityTextView = (TextView) findViewById(R.id.quantity_text_view);
         quantityTextView.setText("" + quantity);
     }
-    private void displayPrice(int quantity,boolean hasChocolate,boolean hasWhippedCream) {
-        TextView priceTextView = (TextView) findViewById(R.id.price_text_view);
-        int price=calculatePrice(hasChocolate,hasWhippedCream);
-        priceTextView.setText(price);
-    }
     private String createOrderSummary(String name,int price,boolean hasWhippedCream,boolean hasChccolate) {
         String priceMessage="Name:"+name+"\nWant Whipped Cream?: "+hasWhippedCream+"\nWant Chocolate?"+hasChccolate+"\nTotal: $"+price;
         priceMessage+="\nThank You!";
         return priceMessage;
-
-    }
-    public void displayOrderSummary(String priceMessage){
-        TextView priceTextView = (TextView) findViewById(R.id.price_text_view);
-        priceTextView.setText( priceMessage );
     }
     public void increment(View view){
         if(quantity<100)
@@ -61,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         CheckBox whippedCreamCheckbox=(CheckBox)findViewById(R.id.whipped_cream_checkbox);
         CheckBox chocolateCheckBox =(CheckBox)findViewById(R.id.chocolate_checkbox);
         boolean hasWhippedCream=whippedCreamCheckbox.isChecked(),hasChocolate=chocolateCheckBox .isChecked();
-        displayPrice(quantity*price,hasChocolate,hasWhippedCream);
     }
     public void decrement(View view){
         if(quantity>1)
@@ -70,16 +61,8 @@ public class MainActivity extends AppCompatActivity {
         CheckBox whippedCreamCheckbox=(CheckBox)findViewById(R.id.whipped_cream_checkbox);
         CheckBox chocolateCheckBox =(CheckBox)findViewById(R.id.chocolate_checkbox);
         boolean hasWhippedCream=whippedCreamCheckbox.isChecked(),hasChocolate=chocolateCheckBox .isChecked();
-        displayPrice(quantity*price,hasChocolate,hasWhippedCream);
 
     }
-    /*public boolean itemClicked(View view){
-        CheckBox checkbox=(CheckBox)view;
-        if(checkbox.isChecked()){
-           return true;
-        }
-        return false;
-    }*/
     private int calculatePrice(boolean haaChocolate,boolean hasWhippedCream){
         if(hasWhippedCream){
             price++;
@@ -97,9 +80,26 @@ public class MainActivity extends AppCompatActivity {
         int price=calculatePrice(hasChocolate,hasWhippedCream);
         EditText nameFireld=(EditText)findViewById(R.id.name);
         String name=nameFireld.getText().toString();
-        String priceMessage=createOrderSummary(name,price,hasWhippedCream,hasChocolate);
-        displayQuantity(quantity);
-        displayOrderSummary(priceMessage);
+
+
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("*/*");
+//        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+//        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+//
+        String subjectOfEmail=name+"'s order";
+        String bodyOfEmail=createOrderSummary(name,price,hasWhippedCream,hasChocolate);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subjectOfEmail);
+        intent.putExtra(Intent.EXTRA_TEXT, bodyOfEmail);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+
+//        Intent intent=new Intent(Intent.ACTION_VIEW);
+//        intent.setData(Uri.parse("geo:47.6,-122.3"));
+//        if(intent.resolveActivity(getPackageManager())!=null){
+//            startActivity(intent);
+//        }
     }
 
 }
